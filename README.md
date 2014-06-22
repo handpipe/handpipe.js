@@ -1,4 +1,4 @@
-# genplate [![Build Status](https://travis-ci.org/alanshaw/genplate.svg?branch=master)](https://travis-ci.org/alanshaw/genplate)
+# genplate [![Build Status](https://travis-ci.org/alanshaw/genplate.svg?branch=master)](https://travis-ci.org/alanshaw/genplate) [![Dependency Status](https://david-dm.org/alanshaw/genplate.svg)](https://david-dm.org/alanshaw/genplate)
 
 Streaming templates where template data is retrieved asynchronously using generators.
 
