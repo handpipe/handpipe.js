@@ -4,7 +4,7 @@
   "description": "Streaming templates where template data is retrieved asynchronously using generators",
   "main": "genplate.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --harmony test/test.js"
   },
   "repository": {
     "type": "git",
