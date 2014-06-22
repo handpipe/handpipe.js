@@ -2,7 +2,26 @@
 
 Streaming templates where template data is retrieved asynchronously using generators.
 
-## Dream code
+**Currently you can only output variables `{{varname}}` - no conditionals/loops**
+
+## Getting started
+
+Install node >= 0.11
+
+Start node using `--harmony` flag.
+
+### Example
+
+Given template.html:
+
+```html
+<!doctype html>
+<div>
+  <h1>{{title}}</h1>
+</div>
+```
+
+Read, process and pipe to output.html:
 
 ```js
 var fs = require("fs")
@@ -10,60 +29,29 @@ var fs = require("fs")
 
 fs.createReadStream("template.html")
   .pipe(genplate(function (next, cb) {
-    // Some async operation to get data for next.property
-    cb(null, {foo: "bar"})
+    // Some async operation to get data for next.key
+    setTimeout(function () {
+      if (next.key == "title")
+        cb(null, "foobar")
+    }, 1000)
   }))
   .pipe(fs.createWriteStream("output.html"))
 ```
 
-## Compiled template
+## API
 
-```html
-<!doctype html>
-<div>
-  <h1>{{title}}</h1>
-  <ul>
-  {{loop}}
-    <li>{{tweet}}</li>
-  {{/loop}}
-  </ul>
-</div>
-```
+**genplate([ getter ])**
 
-```js
-module.exports = function (getter) {
-  
-  function* template () {
-    var html = "<!doctype html><div><ul>"
-    var _0 = yield {property: "title"}
-    html = html + _0
-    var _1 = null
-    var _counter0 = 0
-    while (_1 = yield {property: "tweet", index: _counter0}) {
-      html = html + "<li>" + _1 + </li>
-      _counter0++
-    }
-    html = html + "</ul></div>"
-    return html
-  }
-  
-  
-  var g = template()
-  var next = g.next()
-  
-  function getNext (next, generator) {
-    if (next.done) return
-  
-    getter(next.value, function (er, result) {
-      if (er) throw er
-      getNext(generator.next(result), generator)
-    })
-  }
-  
-  getNext(g.next(), g)
+### getter
 
-  through2(function (chunk, enc, cb) {
-  })
-}
+The `getter` function gets values for the template. It has the signature `function (next, cb) {}`.
 
-```
+`next` is an object that has a `key` property. This is the name of the variable / function your code should invoke to retrieve the value. In loops, the next object will also contain an `index` property.
+
+Invoke `cb` when the value has been retrieved. Pass the value as the second argument (error as the first if one occurred).
+
+## Advanced usage
+ 
+### Compile/apply only
+
+genplate exposes the compile/apply through streams as `genplate.compile` and `genplate.apply` so you can compile a template ahead of time and reuse it multiple times with different getter functions.

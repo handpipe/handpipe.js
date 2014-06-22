@@ -1,0 +1,31 @@
+{
+  "name": "genplate",
+  "version": "0.0.0",
+  "description": "Streaming templates where template data is retrieved asynchronously using generators",
+  "main": "genplate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alanshaw/genplate.git"
+  },
+  "keywords": [
+    "template",
+    "engine",
+    "stream",
+    "generators",
+    "handlebars"
+  ],
+  "author": "Alan Shaw",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alanshaw/genplate/issues"
+  },
+  "homepage": "https://github.com/alanshaw/genplate",
+  "dependencies": {
+    "plexer": "0.0.3",
+    "split2": "^0.1.2",
+    "through2": "^0.5.1"
+  }
+}
