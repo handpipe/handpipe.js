@@ -1,6 +1,6 @@
 {
   "name": "genplate",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Streaming templates where template data is retrieved asynchronously using generators",
   "main": "genplate.js",
   "scripts": {
