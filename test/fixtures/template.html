@@ -1,4 +1,12 @@
 <!doctype html>
 <div>
   <h1>{{title}}</h1>
+  <ul>
+    {{#each tweets}}
+    <li>
+      {{text}}
+      {{#each hashtags}}#{{this}} {{/each}}
+    </li>
+    {{/each}}
+  </ul>
 </div>
