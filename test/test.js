@@ -1,18 +1,19 @@
 var fs = require("fs")
 var genplate = require("../")
 
-var tweets = [{text: "Oh HAI!", hashtags: ["OMG", "WTF"], author: "Foo Bar"}]
-
 fs.createReadStream(__dirname + "/fixtures/template.html")
-  .pipe(genplate(function (next, cb) {
-    if (next.key == "title") {
+  .pipe(genplate({
+    title: function (next, cb) {
       setTimeout(function () {
         cb(null, "Foo")
       }, 2000)
-    }
-
-    if (next.key == "tweets") {
-      return cb(null, tweets)
+    },
+    tweets: [
+      {text: "Oh HAI!", hashtags: ["OMG", "WTF"], author: "Foo Bar"},
+      {text: "OMGWTF!"}
+    ],
+    author: function (next, cb) {
+      cb(null, "Author" + next.index)
     }
   }))
   .pipe(process.stdout)
