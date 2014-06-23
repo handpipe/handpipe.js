@@ -10,7 +10,7 @@ module.exports = function (data) {
     gStr += chunk.toString()
     cb()
   }, function (cb) {
-    console.log(gStr)
+    //console.log(gStr)
     var g = vm.runInNewContext(gStr)(this)
     gStr = null
 
