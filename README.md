@@ -2,8 +2,6 @@
 
 Streaming templates where template data is retrieved asynchronously using generators.
 
-**Currently you can only output variables `{{varname}}` and loops `{{#each}}`- no conditionals**
-
 ## Getting started
 
 Install node >= 0.11
@@ -83,6 +81,26 @@ genplate(function (next, cb) {
 ```
 
 If sprocket objects **do not** have "name" and/or "teeth" properties then the getter function will be called so that a value can be provided. `next.key` will be "name" or "teeth" (depending on which property is currently being evaluated), `next.iterable` will be the array of sprockets and `next.index` will be index of the sprocket in the array.
+
+### Conditionals
+
+Use the `if` block helper to create conditionally rendered template blocks:
+
+```html
+{{#if title}}
+  <h1>{{title}}</h1>
+{{/if}}
+```
+
+With optional alternative:
+
+```html
+{{#if title}}
+  <h1>{{title}}</h1>
+{{else}}
+  <h1>Unnamed</h1>
+{{/if}}
+```
 
 ## Example compiled template
 

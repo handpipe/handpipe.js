@@ -1,7 +1,7 @@
 var fs = require("fs")
 var genplate = require("../")
 
-var tweets = [{text: "Oh HAI!", hashtags: ["OMG", "WTF"]}]
+var tweets = [{text: "Oh HAI!", hashtags: ["OMG", "WTF"], author: "Foo Bar"}]
 
 fs.createReadStream(__dirname + "/fixtures/template.html")
   .pipe(genplate(function (next, cb) {

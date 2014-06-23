@@ -6,6 +6,7 @@
     <li>
       {{text}}
       {{#each hashtags}}#{{this}} {{/each}}
+      by {{#if author}}{{author}}{{else}}Unknown{{/if}}
     </li>
     {{/each}}
   </ul>

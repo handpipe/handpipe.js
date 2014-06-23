@@ -19,59 +19,44 @@ module.exports = function () {
     }
 
     if (inJs) {
-      var iterable = iterables.length ? iterables[iterables.length - 1] : null
-      var index = indexes.length ? indexes[indexes.length - 1] : -1
-
       if (chunk[0] == "#") {
         if (chunk.slice(1, 5) == "each") {
-          this.push("var _" + varId + ";")
-          if (iterable) {
-            if (chunk.slice(6) == "this") {
-              this.push("if (_" + iterable + "[_" + index + "] !== undefined) {")
-              this.push("_" + varId + " = _" + iterable + "[_" + index + "];")
-            } else {
-              this.push("if (_" + iterable + "[_" + index + "]['" + chunk.slice(6) + "'] !== undefined) {")
-              this.push("_" + varId + " = _" + iterable + "[_" + index + "]['" + chunk.slice(6) + "'];")
-            }
-            this.push("} else {")
-            this.push("_" + varId + " = yield {key: '" + chunk.slice(6) + "', iterable: _" + iterable + ", index: _" + index + "};")
-            this.push("}")
-          } else {
-            this.push("_" + varId + " = yield {key: '" + chunk.slice(6) + "'};")
-          }
+          lookupVar(chunk.slice(6).trim(), varId, iterables, indexes, this)
           iterables.push(varId)
           varId++
           this.push("for (var _" + varId + " = 0; _" + varId + " < _" + iterables[iterables.length - 1] + ".length; _" + varId + "++) {")
           indexes.push(varId)
           varId++
+        } else if (chunk.slice(1, 3) == "if") {
+          lookupVar(chunk.slice(4).trim(), varId, iterables, indexes, this)
+          this.push("if (_" + varId + ") {")
+          varId++
+        } else {
+          return cb(new Error("Unknown block open " + chunk))
         }
       } else if (chunk[0] == "/") {
         if (chunk.slice(1, 5) == "each") {
           iterables.pop()
           indexes.pop()
           this.push("}")
-        }
-      } else {
-        this.push("var _" + varId + ";")
-        if (iterable) {
-          if (chunk == "this") {
-            this.push("if (_" + iterable + "[_" + index + "] !== undefined) {")
-            this.push("_" + varId + " = _" + iterable + "[_" + index + "];")
-          } else {
-            this.push("if (_" + iterable + "[_" + index + "]['" + chunk + "'] !== undefined) {")
-            this.push("_" + varId + " = _" + iterable + "[_" + index + "]['" + chunk + "'];")
-          }
-          this.push("} else {")
-          this.push("_" + varId + " = yield {key: '" + chunk + "', iterable: _" + iterable + ", index: _" + index + "};")
+        } else if (chunk.slice(1, 3) == "if") {
           this.push("}")
         } else {
-          this.push("_" + varId + " = yield {key: '" + chunk + "'};")
+          return cb(new Error("Unknown block close " + chunk))
         }
+      } else if (chunk.trim() == "else") {
+        this.push("} else {")
+      } else {
+        lookupVar(chunk, varId, iterables, indexes, this)
         this.push("ts.push(_" + varId + ");")
         varId++
       }
     } else {
-      this.push("ts.push(" + JSON.stringify(chunk) + ");")
+      chunk = JSON.stringify(chunk)
+
+      if (chunk != '""') {
+        this.push("ts.push(" + chunk + ");")
+      }
     }
 
     inJs = !inJs
@@ -90,4 +75,26 @@ module.exports = function () {
   splitter.pipe(ts)
 
   return plexer(splitter, ts)
+}
+
+// TODO: Lookup in parent scopes
+function lookupVar (varName, newVarId, iterables, indexes, ts) {
+  var iterable = iterables.length ? iterables[iterables.length - 1] : null
+  var index = indexes.length ? indexes[indexes.length - 1] : -1
+
+  if (iterable) {
+    ts.push("var _" + newVarId + ";")
+    if (varName == "this") {
+      ts.push("if (_" + iterable + "[_" + index + "] !== undefined) {")
+      ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "];")
+    } else {
+      ts.push("if (_" + iterable + "[_" + index + "]['" + varName + "'] !== undefined) {")
+      ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "]['" + varName + "'];")
+    }
+    ts.push("} else {")
+    ts.push("_" + newVarId + " = yield {key: '" + varName + "', iterable: _" + iterable + ", index: _" + index + "};")
+    ts.push("}")
+  } else {
+    ts.push("var _" + newVarId + " = yield {key: '" + varName + "'};")
+  }
 }
