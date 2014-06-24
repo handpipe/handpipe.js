@@ -64,10 +64,14 @@ module.exports = function () {
     cb()
 
   }, function (cb) {
+    if (!first) {
+      this.push("})")
+    }
+
     inJs = false
     first = true
     varId = 0
-    this.push("})")
+
     this.push(null)
     cb()
   })
@@ -82,14 +86,27 @@ function lookupVar (varName, newVarId, iterables, indexes, ts) {
   var iterable = iterables.length ? iterables[iterables.length - 1] : null
   var index = indexes.length ? indexes[indexes.length - 1] : -1
 
-  if (iterable) {
+  if (iterable != null) {
     ts.push("var _" + newVarId + ";")
     if (varName == "this") {
-      ts.push("if (_" + iterable + "[_" + index + "] !== undefined) {")
+      ts.push("if (_" + iterable + "[_" + index + "] != null) {")
       ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "];")
-    } else {
-      ts.push("if (_" + iterable + "[_" + index + "]['" + varName + "'] !== undefined) {")
+    } else if (varName.indexOf(".") == -1) {
+      ts.push("if (_" + iterable + "[_" + index + "]['" + varName + "'] != null) {")
       ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "]['" + varName + "'];")
+    } else {
+      // Need to do lookup on variable path
+      var path = varName.split(".")
+      var arrayPath = function (path) {
+        return path.map(function (p) { return "['" + p + "']" }).join("")
+      }
+
+      var condition = path.map(function (p) {
+        return "_" + iterable + "[_" + index + "]" + arrayPath(path.slice(0, path.indexOf(p) + 1)) + " != null"
+      }).join(" && ")
+
+      ts.push("if (" + condition + ") {")
+      ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "]" + arrayPath(path) + ";")
     }
     ts.push("} else {")
     ts.push("_" + newVarId + " = yield {key: '" + varName + "', iterable: _" + iterable + ", index: _" + index + "};")
