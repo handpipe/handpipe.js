@@ -52,9 +52,9 @@ test("async variable", function (t) {
   })
 })
 
-test("falsy variable", function (t) {
+test("falsey variable", function (t) {
   t.plan(2)
-  setupTest("variable-falsy.html", {
+  setupTest("variable-falsey.html", {
     emptyString: "",
     emptyArray: [],
     nully: null,
