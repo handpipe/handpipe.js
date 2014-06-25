@@ -32,4 +32,17 @@ test("variable with whitespace", function (t) {
   })
 })
 
+test("async variable", function (t) {
+  t.plan(2)
+  setupTest("variable-async.html", {
+    title: function (next, cb) {
+      setTimeout(function () {
+        cb(null, "Hello World!")
+      }, 100)
+    }
+  }, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})
 
