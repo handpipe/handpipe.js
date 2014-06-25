@@ -160,3 +160,11 @@ test("path if", function (t) {
     t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
   })
 })
+
+test("if else", function (t) {
+  t.plan(2)
+  setupTest("if-else.html", {foo: {selected: true}, bar: {selected: false}}, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})
