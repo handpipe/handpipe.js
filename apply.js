@@ -44,10 +44,25 @@ module.exports = function (data) {
 
 function valueForPath (path, data, next, cb) {
   if (!data) return cb()
-
-  if (path.length == 1) return cb(null, data[path[0]])
-
+  
   var val = data[path[0]]
+
+  if (path.length == 1) {
+    if (path[0] == "this") {
+      val = next.value.iterable ? next.value.iterable : data
+
+      if (!val) return cb(null, "")
+
+      if (val instanceof Function) {
+        return val(next.value, function (er, data) {
+          if (er) return cb(er)
+          cb(null, data[next.value.index])
+        })
+      }
+    }
+
+    return cb(null, val)
+  }
 
   if (!val) return cb(null, "")
 

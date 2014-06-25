@@ -11,7 +11,7 @@ function setupTest (template, data, cb) {
   fs.createReadStream(templatesDir + "/" + template)
     .pipe(genplate(data))
     .pipe(through2(function (chunk, enc, cb) {
-      //console.log(chunk + "")
+      console.log(chunk + "")
       this.push(chunk, enc)
       cb()
     }))
@@ -164,6 +164,45 @@ test("path if", function (t) {
 test("if else", function (t) {
   t.plan(2)
   setupTest("if-else.html", {foo: {selected: true}, bar: {selected: false}}, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})
+
+test("each", function (t) {
+  t.plan(2)
+  setupTest("each.html", {
+    title: "Tweets",
+    tweets: [
+      {
+        text: "OMG",
+        author: {name: "SteveDave69"}
+      },
+      {
+        text: "WTF",
+        hashtags: function (next, cb) {
+          setTimeout(function () {
+            cb(null, ["YOLO", "ROFL"])
+          }, 250)
+        },
+        author: {name: "Paul Bob"}
+      },
+      {
+        text: "BBQ",
+        author: function (next, cb) {
+          setTimeout(function () {
+            cb(null, {
+              name: function (next, cb) {
+                setTimeout(function () {
+                  cb(null, "Pom Bear")
+                }, 50)
+              }
+            })
+          }, 250)
+        }
+      }
+    ]
+  }, function (er, data) {
     t.ifError(er, "Error during " + data.template + " setup")
     t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
   })
