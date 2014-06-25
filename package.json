@@ -4,7 +4,7 @@
   "description": "Streaming templates where template data is retrieved asynchronously using generators",
   "main": "genplate.js",
   "scripts": {
-    "test": "node --harmony test/test.js"
+    "test": "node --harmony node_modules/.bin/tape test/test.js"
   },
   "repository": {
     "type": "git",
@@ -27,5 +27,9 @@
     "plexer": "0.0.3",
     "split2": "^0.1.2",
     "through2": "^0.5.1"
+  },
+  "devDependencies": {
+    "concat-stream": "^1.4.6",
+    "tape": "^2.13.3"
   }
 }
