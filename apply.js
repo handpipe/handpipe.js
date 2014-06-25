@@ -17,25 +17,47 @@ module.exports = function (data) {
     function getNext (next, generator) {
       if (next.done) return cb()
 
-      var key = next.value.key
+      valueForPath(next.value.key.split("."), data, next, function (er, val) {
+        if (er) return cb(er)
 
-      // No data
-      if (!data[key]) {
-        return getNext(generator.next(""), generator)
-      }
+        // No data
+        if (!val) {
+          return getNext(generator.next(""), generator)
+        }
 
-      // Async operation
-      if (data[key] instanceof Function) {
-        return data[key](next.value, function (er, result) {
-          if (er) return cb(er)
-          getNext(generator.next(result), generator)
-        })
-      }
+        // Async operation
+        if (val instanceof Function) {
+          return val(next.value, function (er, result) {
+            if (er) return cb(er)
+            getNext(generator.next(result), generator)
+          })
+        }
 
-      // Literal value
-      getNext(generator.next(data[key]), generator)
+        // Literal value
+        getNext(generator.next(val), generator)
+      })
     }
 
     getNext(g.next(), g)
   })
+}
+
+function valueForPath (path, data, next, cb) {
+  if (!data) return cb()
+
+  if (path.length == 1) return cb(null, data[path[0]])
+
+  var val = data[path[0]]
+
+  if (!val) return cb(null, "")
+
+  // Turtles all the way down
+  if (val instanceof Function) {
+    return val(next.value, function (er, data) {
+      if (er) return cb(er)
+      valueForPath(path.slice(1), data, next, cb)
+    })
+  }
+
+  valueForPath(path.slice(1), val, next, cb)
 }
