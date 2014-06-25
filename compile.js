@@ -48,7 +48,7 @@ module.exports = function () {
         this.push("} else {")
       } else {
         lookupVar(chunk.trim(), varId, iterables, indexes, this)
-        this.push("ts.push(_" + varId + ");")
+        this.push("ts.push(_" + varId + "+'');")
         varId++
       }
     } else {

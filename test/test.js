@@ -1,6 +1,7 @@
 var fs = require("fs")
   , test = require("tape")
   , concat = require("concat-stream")
+  , through2 = require("through2")
   , genplate = require("../")
 
 var templatesDir = __dirname + "/fixtures/templates"
@@ -9,6 +10,11 @@ var templatesDir = __dirname + "/fixtures/templates"
 function setupTest (template, data, cb) {
   fs.createReadStream(templatesDir + "/" + template)
     .pipe(genplate(data))
+    .pipe(through2(function (chunk, enc, cb) {
+      //console.log(chunk + "")
+      this.push(chunk, enc)
+      cb()
+    }))
     .pipe(concat({encoding: "string"}, function (actual) {
       fs.readFile(expectationsDir + "/" + template, "utf8", function (er, expected) {
         cb(er, {template: template, actual: actual, expected: expected})
@@ -40,6 +46,20 @@ test("async variable", function (t) {
         cb(null, "Hello World!")
       }, 100)
     }
+  }, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})
+
+test("falsy variable", function (t) {
+  t.plan(2)
+  setupTest("variable-falsy.html", {
+    emptyString: "",
+    emptyArray: [],
+    nully: null,
+    zero: 0,
+    undef: undefined
   }, function (er, data) {
     t.ifError(er, "Error during " + data.template + " setup")
     t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
