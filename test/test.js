@@ -58,20 +58,6 @@ test("path variable", function (t) {
     doc: {
       chapterOne: {
         title: "Great Expectations"
-      }
-    }
-  }, function (er, data) {
-    t.ifError(er, "Error during " + data.template + " setup")
-    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
-  })
-})
-
-test("async path variable", function (t) {
-  t.plan(2)
-  setupTest("variable-path-async.html", {
-    doc: {
-      chapterOne: {
-        title: "Great Expectations"
       },
       chapterTwo: function (next, cb) {
         setTimeout(function () {
@@ -119,6 +105,56 @@ test("falsey if", function (t) {
     nully: null,
     zero: 0,
     undef: undefined
+  }, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})
+
+test("path if", function (t) {
+  t.plan(2)
+  setupTest("if-path.html", {
+    doc: {
+      chapterOne: {
+        title: "Great Expectations"
+      },
+      chapterTwo: function (next, cb) {
+        setTimeout(function () {
+          cb(null, {
+            title: function (next, cb) {
+              setTimeout(function () {
+                cb(null, "Turtles")
+              }, 138)
+            }
+          })
+        }, 50)
+      },
+      chapterThree: {
+        title: function (next, cb) {
+          setTimeout(function () {
+            cb(null, "Turtle Head")
+          }, 9)
+        }
+      },
+      chapterFour: function (next, cb) {
+        setTimeout(function () {
+          cb(null, {
+            title: function (next, cb) {
+              setTimeout(function () {
+                cb(null, "")
+              }, 138)
+            }
+          })
+        }, 50)
+      },
+      chapterFive: {
+        title: function (next, cb) {
+          setTimeout(function () {
+            cb()
+          }, 9)
+        }
+      }
+    }
   }, function (er, data) {
     t.ifError(er, "Error during " + data.template + " setup")
     t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
