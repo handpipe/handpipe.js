@@ -66,3 +66,15 @@ test("falsey variable", function (t) {
   })
 })
 
+test("falsey if", function (t) {
+  t.plan(2)
+  setupTest("if-falsey.html", {
+    emptyString: "",
+    nully: null,
+    zero: 0,
+    undef: undefined
+  }, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})
