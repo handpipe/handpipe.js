@@ -1,0 +1,34 @@
+<!doctype html>
+<section class="posts">
+  {{#each posts}}
+    <article class="post">
+      <header>
+        <hgroup>
+          <h1>{{title}}</h1>
+          <h2>by {{author}}</h2>
+        </hgroup>
+        <time datetime="{{timestamp}}">{{timestamp}}</time>
+        <div class="main">
+          {{content}}
+        </div>
+        <footer>
+          {{#if links}}
+            <ul class="links">
+              {{#each links}}
+                <li><a href="{{href}}">{{#if title}}{{title}}{{else}}{{href}}{{/if}}</a></li>
+              {{/each}}
+            </ul>
+          {{/if}}
+        </footer>
+      </header>
+    </article>
+  {{/each}}
+</section>
+<div class="tweets">
+  {{#each tweets}}
+    <div class="tweet">
+      <h1><a href="http://twitter.com/{{user.screen_name}}">{{#if name}}{{name}}{{else}}{{user.screen_name}}{{/if}}</a></h1>
+      <p>{{text}}</p>
+    </div>
+  {{/each}}
+</div>
