@@ -83,19 +83,6 @@ genplate({
 
 If sprocket objects **do not** have "name" and/or "teeth" properties then the `data` object passed to genplate will be queried so that a value can be provided. `next.key` will be "name" or "teeth" (depending on which property is currently being evaluated), `next.iterable` will be the array of sprockets and `next.index` will be index of the sprocket in the array.
 
-### HTML escaping
-
-Genplate HTML-escapes values returned by a `{{expression}}`. If you don't want genplate to escape a value, use the "triple-stash", `{{{`.
- 
- ```html
- <div class="entry">
-   <h1>{{title}}</h1>
-   <div class="body">
-     {{{body}}}
-   </div>
- </div> 
- ```
-
 ### Conditionals
 
 Use the `if` block helper to create conditionally rendered template blocks:
@@ -115,6 +102,19 @@ With optional alternative:
   <h1>Unnamed</h1>
 {{/if}}
 ```
+
+### HTML escaping
+
+Genplate HTML-escapes values returned by a `{{expression}}`. If you don't want genplate to escape a value, use the "triple-stash", `{{{`.
+ 
+ ```html
+ <div class="entry">
+   <h1>{{title}}</h1>
+   <div class="body">
+     {{{body}}}
+   </div>
+ </div> 
+ ```
 
 ## Example compiled template
 
