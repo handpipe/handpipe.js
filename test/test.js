@@ -207,3 +207,11 @@ test("each", function (t) {
     t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
   })
 })
+
+test("escape", function (t) {
+  t.plan(2)
+  setupTest("escape.html", {escape: "<>\"'&", unescape: "<>\"'&"}, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})

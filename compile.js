@@ -3,7 +3,7 @@ const split2 = require("split2")
     , plexer = require("plexer")
 
 module.exports = function () {
-  var splitter = split2(/(?:{{)|(?:}})/)
+  var splitter = split2(/(?:\{\{)|(?:\}\}\}?)/)
     , inJs = false
     , first = true
     , varId = 0
@@ -15,6 +15,7 @@ module.exports = function () {
 
     if (first) {
       this.push("(function* (ts) {")
+      this.push('var f=/&/g,c=/</g,e=/>/g,b=/\\\'/g,a=/\\"/g,d=/[&<>\\"\\\']/;function esc(g){return d.test(g)?g.replace(f,"&amp;").replace(c,"&lt;").replace(e,"&gt;").replace(b,"&#39;").replace(a,"&quot;"):g};')
       first = false
     }
 
@@ -47,8 +48,15 @@ module.exports = function () {
       } else if (chunk.trim() == "else") {
         this.push("} else {")
       } else {
+        var escape = true
+
+        if (chunk[0] == "{") {
+          chunk = chunk.slice(1)
+          escape = false
+        }
+
         lookupVar(chunk.trim(), varId, iterables, indexes, this)
-        this.push("ts.push(_" + varId + "+'');")
+        this.push("ts.push(" + (escape ? "esc(" : "") +  "_" + varId + "+''" + (escape ? ")" : "") + ");")
         varId++
       }
     } else {
