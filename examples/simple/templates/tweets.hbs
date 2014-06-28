@@ -1,0 +1,8 @@
+<div class="tweets">
+  {{#each tweets}}
+    <div class="tweet">
+      <h1><a href="http://twitter.com/{{user.screen_name}}">{{#if name}}{{name}}{{else}}{{user.screen_name}}{{/if}}</a></h1>
+      <p>{{text}}</p>
+    </div>
+  {{/each}}
+</div>
