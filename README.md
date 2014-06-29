@@ -39,11 +39,11 @@ fs.createReadStream("template.html")
 
 ## API
 
-**genplate([ data ])**
+### genplate([ data ])
 
 Create a through stream to compile a template and apply a data context to it. Pipe Handlebars in, and HTML/Markdown/whatever out. Shortcut for `genplate.compile().pipe(genplate.apply([ data ]))`
 
-### data
+#### data
 
 The `data` object gets values for the template. Properties that require async processing are functions with the signature `function (next, cb) {}`.
 
@@ -51,11 +51,11 @@ The `data` object gets values for the template. Properties that require async pr
 
 Invoke `cb` when the value has been retrieved. Pass the value as the second argument (error as the first if one occurred).
 
-**genplate.compile()**
+### genplate.compile()
 
 Create a new genplate compiler. The compiler is a through stream you can pipe templates into and compiled template JS out from.
 
-**genplate.apply([ data ])**
+### genplate.apply([ data ])
 
 Applies the [`data`](#data) to the compiled template. Returns a through stream that you can pipe compiled template JS into and HTML/Markdown/whatever out from. 
 
