@@ -118,7 +118,7 @@ Genplate HTML-escapes values returned by a `{{expression}}`. If you don't want g
 
 ### Comments
 
-Use `{{! comment }}` or `{{!-- comment --}}` to create comments that don't appear in output HTML. Any comments that must contain `}}` or other should use the `{{!-- --}}` syntax.
+Use `{{! comment }}` or `{{!-- comment --}}` to create comments that don't appear in output HTML. Any comments that must contain `{{` or `}}` should use the `{{!-- --}}` syntax.
 
 ## Example compiled template
 
