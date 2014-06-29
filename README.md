@@ -41,6 +41,8 @@ fs.createReadStream("template.html")
 
 **genplate([ data ])**
 
+Create a through stream to compile a template and apply a data context to it. Pipe Handlebars in, and HTML/Markdown/whatever out. Shortcut for `genplate.compile().pipe(genplate.apply([ data ]))`
+
 ### data
 
 The `data` object gets values for the template. Properties that require async processing are functions with the signature `function (next, cb) {}`.
@@ -59,7 +61,7 @@ Applies the [`data`](#data) to the compiled template. Returns a through stream t
 
 ## Template syntax
 
-Template syntax is a subset of handlebars. A really small subset currently.
+Template syntax is a subset of handlebars.
 
 ### Variable output
 
