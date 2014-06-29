@@ -5,6 +5,7 @@ const split2 = require("split2")
 module.exports = function () {
   var splitter = split2(/(?:\{\{)|(?:\}\}\}?)/)
     , inJs = false
+    , inComment = false
     , first = true
     , varId = 0
     , iterables = []
@@ -20,8 +21,18 @@ module.exports = function () {
     }
 
     if (inJs) {
+      // comment
+      if (inComment) {
+        if (chunk.slice(-2) == "--") {
+          inComment = false
+        }
+      } else if (chunk[0] == "!") {
+        // Are we in {{!-- --}} comment?
+        if (chunk.slice(1, 3) == "--" && chunk.slice(-2) != "--") {
+          inComment = true
+        }
       // block
-      if (chunk[0] == "#") {
+      } else if (chunk[0] == "#") {
         if (chunk.slice(1, 5) == "each") {
           lookupVar(chunk.slice(6).trim(), varId, iterables, indexes, this)
           iterables.push(varId)
@@ -47,8 +58,6 @@ module.exports = function () {
         } else {
           return cb(new Error("Unknown block close " + chunk))
         }
-      // comment
-      } else if (chunk[0] == "!") {
       // alternative
       } else if (chunk.trim() == "else") {
         this.push("} else {")
@@ -72,7 +81,9 @@ module.exports = function () {
       }
     }
 
-    inJs = !inJs
+    if (!inComment) {
+      inJs = !inJs
+    }
 
     cb()
 
@@ -82,8 +93,11 @@ module.exports = function () {
     }
 
     inJs = false
+    inComment = false
     first = true
     varId = 0
+    iterables = []
+    indexes = []
 
     this.push(null)
     cb()
