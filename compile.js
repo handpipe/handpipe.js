@@ -20,6 +20,7 @@ module.exports = function () {
     }
 
     if (inJs) {
+      // block
       if (chunk[0] == "#") {
         if (chunk.slice(1, 5) == "each") {
           lookupVar(chunk.slice(6).trim(), varId, iterables, indexes, this)
@@ -35,6 +36,7 @@ module.exports = function () {
         } else {
           return cb(new Error("Unknown block open " + chunk))
         }
+      // end block
       } else if (chunk[0] == "/") {
         if (chunk.slice(1, 5) == "each") {
           iterables.pop()
@@ -45,6 +47,9 @@ module.exports = function () {
         } else {
           return cb(new Error("Unknown block close " + chunk))
         }
+      // comment
+      } else if (chunk[0] == "!") {
+      // alternative
       } else if (chunk.trim() == "else") {
         this.push("} else {")
       } else {

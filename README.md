@@ -114,7 +114,11 @@ Genplate HTML-escapes values returned by a `{{expression}}`. If you don't want g
      {{{body}}}
    </div>
  </div> 
- ```
+```
+
+### Comments
+
+Use `{{! comment }}` to create comments that don't appear in output HTML.
 
 ## Example compiled template
 

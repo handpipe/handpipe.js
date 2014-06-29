@@ -215,3 +215,11 @@ test("escape", function (t) {
     t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
   })
 })
+
+test("comment", function (t) {
+  t.plan(2)
+  setupTest("comment.html", null, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})
