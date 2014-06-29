@@ -49,6 +49,14 @@ The `data` object gets values for the template. Properties that require async pr
 
 Invoke `cb` when the value has been retrieved. Pass the value as the second argument (error as the first if one occurred).
 
+**genplate.compile()**
+
+Create a new genplate compiler. The compiler is a through stream you can pipe templates into and compiled template JS out from.
+
+**genplate.apply([ data ])**
+
+Applies the [`data`](#data) to the compiled template. Returns a through stream that you can pipe compiled template JS into and HTML/Markdown/whatever out from. 
+
 ## Template syntax
 
 Template syntax is a subset of handlebars. A really small subset currently.
@@ -127,9 +135,3 @@ Incase you're interested...
 ```js
 (function* (ts) {ts.push("<!doctype html>\n<div>\n  <h1>");var _0 = yield {key: 'title'};ts.push(_0);ts.push("</h1>\n  <ul>\n    ");var _1 = yield {key: 'tweets'};for (var _2 = 0; _2 < _1.length; _2++) {ts.push("\n    <li>\n      ");var _3;if (_1[_2]['text'] !== undefined) {_3 = _1[_2]['text'];} else {_3 = yield {key: 'text', iterable: _1, index: _2};}ts.push(_3);ts.push("\n      ");var _4;if (_1[_2]['hashtags'] !== undefined) {_4 = _1[_2]['hashtags'];} else {_4 = yield {key: 'hashtags', iterable: _1, index: _2};}for (var _5 = 0; _5 < _4.length; _5++) {ts.push("#");var _6;if (_4[_5] !== undefined) {_6 = _4[_5];} else {_6 = yield {key: 'this', iterable: _4, index: _5};}ts.push(_6);ts.push(" ");}ts.push("\n      by ");var _7;if (_1[_2]['author'] !== undefined) {_7 = _1[_2]['author'];} else {_7 = yield {key: 'author', iterable: _1, index: _2};}if (_7) {var _8;if (_1[_2]['author'] !== undefined) {_8 = _1[_2]['author'];} else {_8 = yield {key: 'author', iterable: _1, index: _2};}ts.push(_8);} else {ts.push("Unknown");}ts.push("\n    </li>\n    ");}ts.push("\n  </ul>\n</div>");})
 ```
-
-## Advanced usage
- 
-### Compile/apply only
-
-genplate exposes the compile/apply through streams as `genplate.compile` and `genplate.apply` so you can compile a template ahead of time and reuse it multiple times with different getter functions.
