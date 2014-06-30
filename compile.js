@@ -111,19 +111,20 @@ module.exports = function () {
 // TODO: Lookup in parent scopes
 function lookupVar (varName, newVarId, iterables, indexes, ts) {
   var iterable = iterables.length ? iterables[iterables.length - 1] : null
-  var index = indexes.length ? indexes[indexes.length - 1] : -1
+    , index = indexes.length ? indexes[indexes.length - 1] : -1
+    , sep = /[./]/
 
   if (iterable != null) {
     ts.push("var _" + newVarId + ";")
     if (varName == "this") {
       ts.push("if (_" + iterable + "[_" + index + "] != null) {")
       ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "];")
-    } else if (varName.indexOf(".") == -1) {
+    } else if (!sep.test(varName)) {
       ts.push("if (_" + iterable + "[_" + index + "]['" + varName + "'] != null) {")
       ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "]['" + varName + "'];")
     } else {
       // Need to do lookup on variable path
-      var path = varName.split(".")
+      var path = varName.split(sep)
       var arrayPath = function (path) {
         return path.map(function (p) { return "['" + p + "']" }).join("")
       }

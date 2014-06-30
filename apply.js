@@ -17,7 +17,7 @@ module.exports = function (data) {
     function getNext (next, generator) {
       if (next.done) return cb()
 
-      valueForPath(next.value.key.split("."), data, next, function (er, val) {
+      valueForPath(next.value.key.split(/[./]/), data, next, function (er, val) {
         if (er) return cb(er)
 
         // No data
