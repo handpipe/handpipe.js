@@ -1,0 +1,9 @@
+{{#each items}}
+<div>
+  <ul>
+    {{#each subitems}}
+    <li>{{!--{../../book.name}--}}{{../author.name}} {{../timestamp}} - {{name}}</li>
+    {{/each}}
+  </ul>
+</div>
+{{/each}}

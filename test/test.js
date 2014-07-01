@@ -223,3 +223,28 @@ test("comment", function (t) {
     t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
   })
 })
+
+test("parent context", function (t) {
+  t.plan(2)
+  setupTest("parent-context.html", {
+    /*book: {
+      name: "Learn you haskell for great good"
+    },*/
+    items: [
+      {
+        author: function (next, cb) {
+          setTimeout(function () {
+            cb(null, {name: "Dave"})
+          }, 100)
+        },
+        timestamp: "2014-07-01",
+        subitems: function (next, cb) {
+          cb(null, [{name: "foo"}])
+        }
+      }
+    ]
+  }, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})

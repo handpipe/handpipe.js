@@ -7,8 +7,8 @@ module.exports = function () {
     , inJs = false
     , inComment = false
     , first = true
-    , varId = 0
-    , iterables = []
+    , tmpVar = 0
+    , contexts = []
     , indexes = []
 
   var ts = through2(function (chunk, enc, cb) {
@@ -34,23 +34,20 @@ module.exports = function () {
       // block
       } else if (chunk[0] == "#") {
         if (chunk.slice(1, 5) == "each") {
-          lookupVar(chunk.slice(6).trim(), varId, iterables, indexes, this)
-          iterables.push(varId)
-          varId++
-          this.push("for (var _" + varId + " = 0; _" + varId + " < _" + iterables[iterables.length - 1] + ".length; _" + varId + "++) {")
-          indexes.push(varId)
-          varId++
+          contexts.push(lookupVar(chunk.slice(6).trim(), contexts, indexes, this))
+          tmpVar = genVarName()
+          this.push("for (var " + tmpVar + " = 0; " + tmpVar + " < " + indexedVar(contexts[contexts.length - 1]) + ".length; " + tmpVar + "++) {")
+          indexes.push(tmpVar)
         } else if (chunk.slice(1, 3) == "if") {
-          lookupVar(chunk.slice(4).trim(), varId, iterables, indexes, this)
-          this.push("if (_" + varId + ") {")
-          varId++
+          tmpVar = lookupVar(chunk.slice(4).trim(), contexts, indexes, this)
+          this.push("if (" + tmpVar + ") {")
         } else {
           return cb(new Error("Unknown block open " + chunk))
         }
       // end block
       } else if (chunk[0] == "/") {
         if (chunk.slice(1, 5) == "each") {
-          iterables.pop()
+          contexts.pop()
           indexes.pop()
           this.push("}")
         } else if (chunk.slice(1, 3) == "if") {
@@ -69,9 +66,8 @@ module.exports = function () {
           escape = false
         }
 
-        lookupVar(chunk.trim(), varId, iterables, indexes, this)
-        this.push("ts.push(" + (escape ? "esc(" : "") +  "_" + varId + "+''" + (escape ? ")" : "") + ");")
-        varId++
+        tmpVar = lookupVar(chunk.trim(), contexts, indexes, this)
+        this.push("ts.push(" + (escape ? "esc(" : "") + tmpVar + "+''" + (escape ? ")" : "") + ");")
       }
     } else {
       chunk = JSON.stringify(chunk)
@@ -95,8 +91,8 @@ module.exports = function () {
     inJs = false
     inComment = false
     first = true
-    varId = 0
-    iterables = []
+    tmpVar = null
+    contexts = []
     indexes = []
 
     this.push(null)
@@ -108,38 +104,100 @@ module.exports = function () {
   return plexer(splitter, ts)
 }
 
-// TODO: Lookup in parent scopes
-function lookupVar (varName, newVarId, iterables, indexes, ts) {
-  var iterable = iterables.length ? iterables[iterables.length - 1] : null
+function lookupVar (varName, contexts, indexes, ts) {
+  var context = contexts.length ? contexts[contexts.length - 1] : null
     , index = indexes.length ? indexes[indexes.length - 1] : -1
     , sep = /[./]/
+    , tmpVar = genVarName()
 
-  if (iterable != null) {
-    ts.push("var _" + newVarId + ";")
+  if (context != null) {
+    ts.push("var " + tmpVar + ";")
     if (varName == "this") {
-      ts.push("if (_" + iterable + "[_" + index + "] != null) {")
-      ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "];")
+      ts.push("if (" + indexedVar(context, index) + " != null) {")
+      // Is async fetch?
+      ts.push("if (typeof " + indexedVar(context, index) + " == 'function') {")
+      ts.push(tmpVar + " = yield {key: '" + varName + "', context: " + indexedVar(context, index) + "};")
+      ts.push("} else {")
+      ts.push(tmpVar + " = " + indexedVar(context, index) + ";")
+      ts.push("}")
+      ts.push("} else {")
+      ts.push(tmpVar + " = yield {key: '" + varName + "', context: " + indexedVar(context, index) + "};")
+      ts.push("}")
     } else if (!sep.test(varName)) {
-      ts.push("if (_" + iterable + "[_" + index + "]['" + varName + "'] != null) {")
-      ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "]['" + varName + "'];")
+      ts.push("if (" + indexedVar(context, index) + "['" + varName + "'] != null) {")
+      // Is async fetch?
+      ts.push("if (typeof " + indexedVar(context, index) + "['" + varName + "'] == 'function') {")
+      ts.push(tmpVar + " = yield {key: '" + varName + "', context: " + indexedVar(context, index) + "};")
+      ts.push("} else {")
+      ts.push(tmpVar + " = " + indexedVar(context, index) + "['" + varName + "'];")
+      ts.push("}")
+      ts.push("} else {")
+      ts.push(tmpVar + " = yield {key: '" + varName + "', context: " + indexedVar(context, index) + "};")
+      ts.push("}")
     } else {
       // Need to do lookup on variable path
-      var path = varName.split(sep)
-      var arrayPath = function (path) {
-        return path.map(function (p) { return "['" + p + "']" }).join("")
+      // TODO: Split on regex
+      var path = varName.replace(/\.\./g, "--").split(sep).map(function (p) {
+        return p.replace(/--/g, "..")
+      })
+
+      var parents
+
+      for (parents = 0; parents < path.length; parents++) {
+        if (path[parents] != "..") break
       }
 
-      var condition = path.map(function (p) {
-        return "_" + iterable + "[_" + index + "]" + arrayPath(path.slice(0, path.indexOf(p) + 1)) + " != null"
-      }).join(" && ")
+      if (parents > contexts.length) {
+        return ts.emit(new Error(varName + " attempted lookup above root context"))
+      }
 
-      ts.push("if (" + condition + ") {")
-      ts.push("_" + newVarId + " = _" + iterable + "[_" + index + "]" + arrayPath(path) + ";")
+      if (parents == contexts.length) {
+        // All the way up to root
+        // TODO
+        throw new Error("Not implemented")
+      } else {
+
+        if (parents > 0) {
+          // Some parent context
+          context = contexts[contexts.length - 1 - parents]
+          index = indexes[indexes.length - 1 - parents]
+          path = path.slice(parents)
+        }
+
+        var currentVar = indexedVar(context, index)
+          , lastVar = null
+
+        ts.push(tmpVar + " = " + currentVar + ";")
+
+        path.forEach(function (p) {
+          lastVar = currentVar
+          currentVar = tmpVar + "['" + p + "']"
+          ts.push("if (" + currentVar + " != null) {")
+          ts.push("if (typeof " + currentVar + " == 'function') {")
+          ts.push(tmpVar + " = yield {key: '" + p + "', context: " + lastVar + "};")
+          ts.push("} else {")
+          ts.push(tmpVar + " = " + currentVar + ";")
+          ts.push("}")
+          ts.push("} else {")
+          ts.push(tmpVar + " = yield {key: '" + p + "', context: " + lastVar + "};")
+          ts.push("}")
+        })
+      }
     }
-    ts.push("} else {")
-    ts.push("_" + newVarId + " = yield {key: '" + varName + "', iterable: _" + iterable + ", index: _" + index + "};")
-    ts.push("}")
   } else {
-    ts.push("var _" + newVarId + " = yield {key: '" + varName + "'};")
+    ts.push("var " + tmpVar + " = yield {key: '" + varName + "'};")
   }
+
+  return tmpVar
 }
+
+function indexedVar (name, index) {
+  return name + (index === undefined ? "" : "[" + index + "]")
+}
+
+const genVarName = (function () {
+  var id = 0
+  return function () {
+    return "_" + (++id)
+  }
+})()
