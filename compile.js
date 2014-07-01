@@ -41,6 +41,10 @@ module.exports = function () {
         } else if (chunk.slice(1, 3) == "if") {
           tmpVar = lookupVar(chunk.slice(4).trim(), contexts, indexes, this)
           this.push("if (" + tmpVar + ") {")
+        } else if (chunk.slice(1, 5) == "with") {
+          tmpVar = lookupVar(chunk.slice(6).trim(), contexts, indexes, this)
+          contexts.push(tmpVar)
+          indexes.push(null)
         } else {
           return cb(new Error("Unknown block open " + chunk))
         }
@@ -52,6 +56,9 @@ module.exports = function () {
           this.push("}")
         } else if (chunk.slice(1, 3) == "if") {
           this.push("}")
+        } else if (chunk.slice(1, 5) == "with") {
+          contexts.pop()
+          indexes.pop()
         } else {
           return cb(new Error("Unknown block close " + chunk))
         }
@@ -147,7 +154,7 @@ function lookupVar (varName, contexts, indexes, ts) {
         if (path[parents] != "..") break
       }
 
-      if (parents == contexts.length) {
+      if (parents > contexts.length) {
         throw new Error(varName + " attempted lookup above root context")
       }
 
@@ -190,7 +197,7 @@ function lookupVar (varName, contexts, indexes, ts) {
 }
 
 function indexedVar (name, index) {
-  return name + (index === undefined ? "" : "[" + index + "]")
+  return name + (index == null ? "" : "[" + index + "]")
 }
 
 const genVarName = (function () {

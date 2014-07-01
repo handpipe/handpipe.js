@@ -1,0 +1,8 @@
+<div>
+  {{#with book}}
+    {{#each chapters}}
+      <h1>{{name}}</h1>
+    {{/each}}
+  {{/with}}
+</div>
+<div>Total chapters: {{#with book.chapters}}{{length}}{{/with}}</div>

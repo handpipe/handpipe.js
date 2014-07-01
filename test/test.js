@@ -248,3 +248,21 @@ test("parent context", function (t) {
     t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
   })
 })
+
+test("with", function (t) {
+  t.plan(2)
+  setupTest("with.html", {
+    book: function (next, cb) {
+      return cb(null, {
+        chapters: [
+          {name: "Chapter 1"},
+          {name: "Chapter 2"},
+          {name: "Chapter 3"}
+        ]
+      })
+    }
+  }, function (er, data) {
+    t.ifError(er, "Error during " + data.template + " setup")
+    t.equal(data.actual, data.expected, "Unexpected contents " + data.template)
+  })
+})
