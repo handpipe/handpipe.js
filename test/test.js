@@ -227,9 +227,9 @@ test("comment", function (t) {
 test("parent context", function (t) {
   t.plan(2)
   setupTest("parent-context.html", {
-    /*book: {
+    book: {
       name: "Learn you haskell for great good"
-    },*/
+    },
     items: [
       {
         author: function (next, cb) {

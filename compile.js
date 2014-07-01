@@ -105,8 +105,8 @@ module.exports = function () {
 }
 
 function lookupVar (varName, contexts, indexes, ts) {
-  var context = contexts.length ? contexts[contexts.length - 1] : null
-    , index = indexes.length ? indexes[indexes.length - 1] : -1
+  var context = contexts[contexts.length - 1]
+    , index = indexes[indexes.length - 1]
     , sep = /[./]/
     , tmpVar = genVarName()
 
@@ -147,23 +147,18 @@ function lookupVar (varName, contexts, indexes, ts) {
         if (path[parents] != "..") break
       }
 
-      if (parents > contexts.length) {
-        return ts.emit(new Error(varName + " attempted lookup above root context"))
+      if (parents == contexts.length) {
+        throw new Error(varName + " attempted lookup above root context")
       }
 
-      if (parents == contexts.length) {
-        // All the way up to root
-        // TODO
-        throw new Error("Not implemented")
-      } else {
+      if (parents > 0) {
+        // Some parent context
+        context = contexts[contexts.length - 1 - parents]
+        index = indexes[indexes.length - 1 - parents]
+        path = path.slice(parents)
+      }
 
-        if (parents > 0) {
-          // Some parent context
-          context = contexts[contexts.length - 1 - parents]
-          index = indexes[indexes.length - 1 - parents]
-          path = path.slice(parents)
-        }
-
+      if (context) {
         var currentVar = indexedVar(context, index)
           , lastVar = null
 
@@ -182,6 +177,9 @@ function lookupVar (varName, contexts, indexes, ts) {
           ts.push(tmpVar + " = yield {key: '" + p + "', context: " + lastVar + "};")
           ts.push("}")
         })
+      } else {
+        // Root context
+        ts.push(tmpVar + " = " + lookupVar(path.join("."), [], [], ts) + ";")
       }
     }
   } else {
