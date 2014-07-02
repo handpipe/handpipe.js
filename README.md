@@ -69,6 +69,23 @@ Output variables using double curly braces:
 
 `{{varname}}`
 
+Genplate supports simple paths so you can output content below the current context:
+
+`{{foo.bar}}` or `{{foo/bar}}`
+
+Nested paths can also include `../` segments, which evaluate their paths against a parent context.
+
+```html
+<h1>Comments</h1>
+
+<div id="comments">
+ {{#each comments}}
+ <h2><a href="/posts/{{../permalink}}#{{id}}">{{title}}</a></h2>
+ <div>{{body}}</div>
+ {{/each}}
+</div>
+```
+
 ### Loops
 
 Use the `each` block helper to iterate over arrays:
@@ -91,7 +108,7 @@ genplate({
 })
 ```
 
-If sprocket objects **do not** have "name" and/or "teeth" properties then the `data` object passed to genplate will be queried so that a value can be provided. `next.key` will be "name" or "teeth" (depending on which property is currently being evaluated), `next.iterable` will be the array of sprockets and `next.index` will be index of the sprocket in the array.
+If sprocket objects **do not** have "name" and/or "teeth" properties then the `data` object passed to genplate will be queried so that a value can be provided. `next.key` will be "name" or "teeth" (depending on which property is currently being evaluated), `next.context` will be the current sprocket object.
 
 ### Conditionals
 
@@ -129,6 +146,20 @@ Genplate HTML-escapes values returned by a `{{expression}}`. If you don't want g
 ### Comments
 
 Use `{{! comment }}` or `{{!-- comment --}}` to create comments that don't appear in output HTML. Any comments that must contain `{{` or `}}` should use the `{{!-- --}}` syntax.
+
+### Context re-binding
+
+Use the `with` block helper to alter the context for a template block:
+
+```html
+<div class="entry">
+  <h1>{{title}}</h1>
+
+  {{#with author}}
+  <h2>By {{firstName}} {{lastName}}</h2>
+  {{/with}}
+</div>
+```
 
 ## Example compiled template
 
