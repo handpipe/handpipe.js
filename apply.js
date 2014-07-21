@@ -1,5 +1,5 @@
-const vm = require("vm")
-    , through = require("through2")
+var vm = require("vm")
+  , through = require("through2")
 
 module.exports = function (root) {
   root = root || {}

@@ -200,7 +200,7 @@ function indexedVar (name, index) {
   return name + (index == null ? "" : "[" + index + "]")
 }
 
-const genVarName = (function () {
+var genVarName = (function () {
   var id = 0
   return function () {
     return "_" + (++id)
