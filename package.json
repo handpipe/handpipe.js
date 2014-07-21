@@ -4,7 +4,8 @@
   "description": "Generator based handlebars style streaming templates.",
   "main": "handpipe.js",
   "scripts": {
-    "test": "node --harmony node_modules/.bin/tape test/test.js"
+    "test": "node --harmony node_modules/.bin/tape test/test.js",
+    "browserify": "browserify -s handpipe handpipe.js > dist/handpipe.js; cat dist/handpipe.js | uglifyjs > dist/handpipe.min.js"
   },
   "repository": {
     "type": "git",
@@ -29,7 +30,9 @@
     "through2": "^0.5.1"
   },
   "devDependencies": {
+    "browserify": "^4.2.3",
     "concat-stream": "^1.4.6",
-    "tape": "^2.13.3"
+    "tape": "^2.13.3",
+    "uglify-js": "^2.4.15"
   }
 }
