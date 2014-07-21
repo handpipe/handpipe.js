@@ -1,16 +1,16 @@
 var fs = require("fs")
   , test = require("tape")
   , concat = require("concat-stream")
-  , through2 = require("through2")
-  , genplate = require("../")
+  , through = require("through2")
+  , hp = require("../")
 
 var templatesDir = __dirname + "/fixtures/templates"
   , expectationsDir = __dirname + "/fixtures/expectations"
 
 function setupTest (template, data, cb) {
   fs.createReadStream(templatesDir + "/" + template)
-    .pipe(genplate(data))
-    .pipe(through2(function (chunk, enc, cb) {
+    .pipe(hp(data))
+    .pipe(through(function (chunk, enc, cb) {
       console.log(chunk + "")
       this.push(chunk, enc)
       cb()
