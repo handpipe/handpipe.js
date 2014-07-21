@@ -1,8 +1,8 @@
 {
-  "name": "genplate",
+  "name": "handpipe",
   "version": "0.9.0",
-  "description": "Streaming templates where template data is retrieved asynchronously using generators",
-  "main": "genplate.js",
+  "description": "Generator based handlebars style streaming templates.",
+  "main": "handpipe.js",
   "scripts": {
     "test": "node --harmony node_modules/.bin/tape test/test.js"
   },
@@ -20,11 +20,11 @@
   "author": "Alan Shaw",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/alanshaw/genplate/issues"
+    "url": "https://github.com/handpipe/handpipe.js/issues"
   },
-  "homepage": "https://github.com/alanshaw/genplate",
+  "homepage": "https://github.com/handpipe/handpipe.js",
   "dependencies": {
-    "plexer": "0.0.3",
+    "duplexer2": "0.0.2",
     "split2": "^0.1.2",
     "through2": "^0.5.1"
   },

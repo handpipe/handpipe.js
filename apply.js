@@ -1,12 +1,12 @@
 const vm = require("vm")
-    , through2 = require("through2")
+    , through = require("through2")
 
 module.exports = function (root) {
   root = root || {}
 
   var gStr = ""
 
-  return through2(function (chunk, enc, cb) {
+  return through(function (chunk, enc, cb) {
     gStr += chunk.toString()
     cb()
   }, function (cb) {

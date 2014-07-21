@@ -1,6 +1,6 @@
-# genplate [![Build Status](https://travis-ci.org/alanshaw/genplate.svg?branch=master)](https://travis-ci.org/alanshaw/genplate) [![Dependency Status](https://david-dm.org/alanshaw/genplate.svg)](https://david-dm.org/alanshaw/genplate)
+# Handpipe.js [![Build Status](https://travis-ci.org/handpipe/handpipe.js.svg?branch=master)](https://travis-ci.org/handpipe/handpipe.js) [![Dependency Status](https://david-dm.org/handpipe/handpipe.js.svg)](https://david-dm.org/handpipe/handpipe.js)
 
-Streaming templates where template data is retrieved asynchronously using generators.
+Generator based handlebars style streaming templates.
 
 ## Getting started
 
@@ -24,10 +24,10 @@ Read, process and pipe to output.html:
 
 ```js
 var fs = require("fs")
-  , genplate = require("genplate")
+  , handpipe = require("handpipe")
 
 fs.createReadStream("template.html")
-  .pipe(genplate({
+  .pipe(handpipe({
     title: function (next, cb) {
       // Some async operation to get data for "title"
       setTimeout(function () { cb(null, "foobar") }, 1000)
@@ -39,9 +39,9 @@ fs.createReadStream("template.html")
 
 ## API
 
-### genplate([ data ])
+### handpipe([ data ])
 
-Create a through stream to compile a template and apply a data context to it. Pipe Handlebars in, and HTML/Markdown/whatever out. Shortcut for `genplate.compile().pipe(genplate.apply([ data ]))`
+Create a through stream to compile a template and apply a data context to it. Pipe Handlebars in, and HTML/Markdown/whatever out. Shortcut for `handpipe.compile().pipe(handpipe.apply([ data ]))`
 
 #### data
 
@@ -51,11 +51,11 @@ The `data` object gets values for the template. Properties that require async pr
 
 Invoke `cb` when the value has been retrieved. Pass the value as the second argument (error as the first if one occurred).
 
-### genplate.compile()
+### handpipe.compile()
 
-Create a new genplate compiler. The compiler is a through stream you can pipe templates into and compiled template JS out from.
+Create a new handpipe compiler. The compiler is a through stream you can pipe templates into and compiled template JS out from.
 
-### genplate.apply([ data ])
+### handpipe.apply([ data ])
 
 Applies the [`data`](#data) to the compiled template. Returns a through stream that you can pipe compiled template JS into and HTML/Markdown/whatever out from. 
 
@@ -69,7 +69,7 @@ Output variables using double curly braces:
 
 `{{varname}}`
 
-Genplate supports simple paths so you can output content below the current context:
+handpipe supports simple paths so you can output content below the current context:
 
 `{{foo.bar}}` or `{{foo/bar}}`
 
@@ -101,14 +101,14 @@ Use the `each` block helper to iterate over arrays:
 You might populate this template with the following JS:
  
 ```js
-genplate({
+handpipe({
   sprockets: function (next, cb) {
     db.sprockets.find({}).toArray(cb)
   }
 })
 ```
 
-If sprocket objects **do not** have "name" and/or "teeth" properties then the `data` object passed to genplate will be queried so that a value can be provided. `next.key` will be "name" or "teeth" (depending on which property is currently being evaluated), `next.context` will be the current sprocket object.
+If sprocket objects **do not** have "name" and/or "teeth" properties then the `data` object passed to handpipe will be queried so that a value can be provided. `next.key` will be "name" or "teeth" (depending on which property is currently being evaluated), `next.context` will be the current sprocket object.
 
 ### Conditionals
 
@@ -132,7 +132,7 @@ With optional alternative:
 
 ### HTML escaping
 
-Genplate HTML-escapes values returned by a `{{expression}}`. If you don't want genplate to escape a value, use the "triple-stash", `{{{`.
+handpipe HTML-escapes values returned by a `{{expression}}`. If you don't want handpipe to escape a value, use the "triple-stash", `{{{`.
  
  ```html
  <div class="entry">

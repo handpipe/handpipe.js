@@ -1,6 +1,6 @@
-const plexer = require("plexer")
-    , compile = require("./compile")
-    , apply = require("./apply")
+var duplex = require("duplexer2")
+  , compile = require("./compile")
+  , apply = require("./apply")
 
 module.exports = function (data) {
   var compiler = compile()
@@ -8,7 +8,7 @@ module.exports = function (data) {
 
   compiler.pipe(applier)
 
-  return plexer(compiler, applier)
+  return duplex(compiler, applier)
 }
 
 module.exports.compile = compile

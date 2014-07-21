@@ -1,9 +1,9 @@
-const split2 = require("split2")
-    , through2 = require("through2")
-    , plexer = require("plexer")
+var split = require("split2")
+  , through = require("through2")
+  , duplex = require("duplexer2")
 
 module.exports = function () {
-  var splitter = split2(/(?:\{\{)|(?:\}\}\}?)/)
+  var splitter = split(/(?:\{\{)|(?:\}\}\}?)/)
     , inJs = false
     , inComment = false
     , first = true
@@ -11,7 +11,7 @@ module.exports = function () {
     , contexts = []
     , indexes = []
 
-  var ts = through2(function (chunk, enc, cb) {
+  var ts = through(function (chunk, enc, cb) {
     chunk = chunk.toString()
 
     if (first) {
@@ -108,7 +108,7 @@ module.exports = function () {
 
   splitter.pipe(ts)
 
-  return plexer(splitter, ts)
+  return duplex(splitter, ts)
 }
 
 function lookupVar (varName, contexts, indexes, ts) {
