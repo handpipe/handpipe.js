@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/handpipe/handpipe.git"
+    "url": "git://github.com/handpipe/handpipe.js.git"
   },
   "keywords": [
     "template",
