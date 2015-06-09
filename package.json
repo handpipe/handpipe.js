@@ -1,6 +1,6 @@
 {
   "name": "handpipe",
-  "version": "0.11.1",
+  "version": "0.11.2",
   "description": "Generator based handlebars style streaming templates.",
   "main": "handpipe.js",
   "scripts": {
